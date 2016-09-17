@@ -13,7 +13,11 @@ module Reg16(reset, CLK, D, Q);
 
   //This is the actual memory unit that powers the whole thing. There is one set
   //of 16 registers, as denoted by [15:0]. 
-  reg    [15:0] Q; 
+  reg    [15:0] Q;
+
+  wire   [15:0] wRegIn;
+  wire   [15:0] wRegOut;
+   
 
   always @ (posedge CLK)
     if(RES)
