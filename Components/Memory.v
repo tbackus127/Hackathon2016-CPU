@@ -1,5 +1,5 @@
 //-----------------------------------------------------------------------------
-// Not Gate
+// D Flip-Flop
 //-----------------------------------------------------------------------------
 module flipFlopD
 
@@ -7,31 +7,24 @@ module flipFlopD
   (
     inD,
     inClk,
-    inZero,
-    inOne,
+    inClr,
+    inSet,
     outQ
   );
   
   // I/O Assignments
   
-  input inD, inClk, inZero, inOne;
+  input inD, inClk, inClr, inSet;
   output outQ;
     
   // Internal state  
   reg r;  
   
-  always @ (posedge inClk)
-    if(~inZero) begin
+  // Synchronous
+  always @ (posedge inClr or negedge inClk)
+    if(inClr)
       r <= 1'b0;
-    end
     else
       r <= inD;
-    end
-    
-  always @ (negedge inZero)
-    if(~inZero) begin
-      r <= 1'b0;
-    end
   
 endmodule
-   
