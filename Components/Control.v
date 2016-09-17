@@ -128,10 +128,14 @@ module Project_7_Segment_Top
   reg  r_Switch_3 = 1'b0;
   reg  r_Switch_4 = 1'b0;
   
+  reg rLED1 = 1'b0;
+  reg rLED2 = 1'b0;
+  
   reg [3:0] r_Count = 4'b0000;
   reg [3:0] r_A = 4'b0000;
   reg [3:0] r_B = 4'b0000;
   reg [3:0] r_Res = 4'b0000;
+  reg [3:0] rDisp = 4'b0000;
   
   // wire w_Segment1_A;
   // wire w_Segment1_B;
@@ -149,26 +153,26 @@ module Project_7_Segment_Top
   wire w_Segment2_G;
 
   // Instantiate Debounce Filter
-  Debounce_Switch Debounce_Switch_Inst
+  Debounce_Switch Debounce_Switch_Inst1
     (.i_Clk(i_Clk),
      .i_Switch(i_Switch_1),
      .o_Switch(w_Switch_1));
-  Debounce_Switch Debounce_Switch_Inst
+  Debounce_Switch Debounce_Switch_Inst2
     (.i_Clk(i_Clk),
      .i_Switch(i_Switch_2),
      .o_Switch(w_Switch_2));
-  Debounce_Switch Debounce_Switch_Inst
+  Debounce_Switch Debounce_Switch_Inst3
     (.i_Clk(i_Clk),
      .i_Switch(i_Switch_3),
      .o_Switch(w_Switch_3));
-  Debounce_Switch Debounce_Switch_Inst
+  Debounce_Switch Debounce_Switch_Inst4
     (.i_Clk(i_Clk),
      .i_Switch(i_Switch_4),
      .o_Switch(w_Switch_4));
      
 	  
   // Purpose: When Switch is pressed, increment counter.
-  // When counter gets to 9, start it back at 0 again.
+  // When counter gets to F, start it back at 0 again.
   always @(posedge i_Clk)
   begin
     r_Switch_1 <= w_Switch_1;
@@ -183,41 +187,45 @@ module Project_7_Segment_Top
           r_Count <= 0;
         else 
           r_Count <= r_Count + 1;
+        rDisp <= r_Count;
       end
       
       // Set A to counter's value
       if (w_Switch_2 == 1'b1 && r_Switch_2 == 1'b0)
       begin
         r_A <= r_Count;
-        assign o_LED_1 = 1'b1;
+        rLED1 <= 1'b1;
       end
       
       // Set B to counter's value
       if (w_Switch_4 == 1'b1 && r_Switch_4 == 1'b0)
       begin
         r_B <= r_Count;
-        assign o_LED_2 = 1'b1;
+        rLED2 <= 1'b1;
       end
       
       // Add and display
       if (w_Switch_3 == 1'b1 && r_Switch_4 == 1'b0)
       begin
         r_Res <= (r_A + r_B);
+        rDisp <= r_Count;
       end
+      
   end
   
   // Instantiate Binary to 7-Segment Converter
+
   Binary_To_7Segment Inst
-    (.i_Clk(i_Clk),
-     .i_Binary_Num(r_Res),
-     .o_Segment_A(w_Segment2_A),
-     .o_Segment_B(w_Segment2_B),
-     .o_Segment_C(w_Segment2_C),
-     .o_Segment_D(w_Segment2_D),
-     .o_Segment_E(w_Segment2_E),
-     .o_Segment_F(w_Segment2_F),
-     .o_Segment_G(w_Segment2_G)
-     );
+  (.i_Clk(i_Clk),
+   .i_Binary_Num(rDisp),
+   .o_Segment_A(w_Segment2_A),
+   .o_Segment_B(w_Segment2_B),
+   .o_Segment_C(w_Segment2_C),
+   .o_Segment_D(w_Segment2_D),
+   .o_Segment_E(w_Segment2_E),
+   .o_Segment_F(w_Segment2_F),
+   .o_Segment_G(w_Segment2_G)
+   );
   
   assign o_Segment2_A = ~w_Segment2_A;
   assign o_Segment2_B = ~w_Segment2_B;
@@ -226,5 +234,8 @@ module Project_7_Segment_Top
   assign o_Segment2_E = ~w_Segment2_E;
   assign o_Segment2_F = ~w_Segment2_F;
   assign o_Segment2_G = ~w_Segment2_G;
+  
+  assign o_LED_1 = ~rLED1;
+  assign o_LED_2 = ~rLED2;
   
 endmodule
