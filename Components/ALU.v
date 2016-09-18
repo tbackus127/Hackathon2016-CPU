@@ -293,7 +293,7 @@ module IsEqual(
    input [15:0] OperandA;
    input [15:0] OperandB;
    output       Result;
-   input   [15:0] Holder;
+   wire   [15:0] Holder;
    
    XorOp Big_Xor(.OperandA(OperandA), 
 		 .OperandB(OperandB), 
