@@ -1,0 +1,47 @@
+must be able to skip up to 2^11 - 1 instructions.
+
+
+regOP is how far into the program I am. regCMD is what is the command at the line specified by regOP
+
+Going to be passed a some sort of op code
+
+Output for PC
+
+5 OP
+3 R1 
+3 R2 
+3 QR
+2 REG
+
+JMP {
+
+passes me a 16 bit array only need 0-10
+
+}
+
+JGO {
+
+get R1 and R2 in seperate 16 bit arrays
+compare values
+
+get 5 bit array for offset
+
+}
+
+JLO {
+
+get R1 and R2 in seperate 16 bit arrays
+compare values
+
+get 5 bit array for offset
+
+}
+
+JEO {
+
+get R1 and R2 in seperate 16 bit arrays
+compare values
+
+get 5 bit array for offset
+
+}
