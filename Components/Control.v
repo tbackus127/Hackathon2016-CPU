@@ -13,7 +13,6 @@ module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out co
   wire [15:0]aluResult;
   wire [15:0]moveResult;
   wire [15:0]jumpResult;
-<<<<<<< HEAD
   
 
   ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
@@ -51,7 +50,6 @@ module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out co
             16'b00,
             16'b00,
             16'b00);
-=======
   wire [15:0]RESULT
   //ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
   //move (.[:0]R1, .[15:0]moveResult);
@@ -89,7 +87,6 @@ module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out co
             .16'b00,
             .16'b00
             .RESULT);
->>>>>>> a89c6f985283679ba0571db2251ec3dc3a8d0290
 endmodule//Control
 
 module mux_32_1 (
@@ -206,7 +203,6 @@ module memory(address, inreg, outreg);
 
 endmodule//memory
 
-<<<<<<< HEAD
 module WriteToReg(
 		   RegNum,
 		   Data,
@@ -214,11 +210,11 @@ module WriteToReg(
 		   Regs
 		   );
 
-   input  [2:0]  RegNum;
-   input  [15:0] Data;
-   input  [15:7] RegList;
-   output [15:7] Regs;
-   wire 	 Holder;
+   input  [2:0]  RegNum;  //The register number to write to
+   input  [15:0] Data;    //The data to write to the register
+   input  [15:7] RegList; //The full list of registers
+   output [15:7] Regs;    //The full list of registers
+   wire 	 Holder;  //Don't worry about it.
    
 
    assign Holder = (RegNum[2] == 0 
@@ -257,8 +253,6 @@ module WriteToReg(
    
 endmodule // WriteToReg
 
-   
-=======
 module mux_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
    output [15:0] X;   // The output line
 
@@ -289,4 +283,3 @@ module mux_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
 		     : A7)));   // {S2,S1,S0} = 3'b111
 endmodule
  // multiplexer_8_1
->>>>>>> a89c6f985283679ba0571db2251ec3dc3a8d0290
