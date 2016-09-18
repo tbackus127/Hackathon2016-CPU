@@ -1,0 +1,35 @@
+:: How to Compile and Load ::
+
+1. Launch Lattice iCEcube2
+2. Click New Project
+ a. Type in a project name
+ b. Choose a directory to save it
+ c. Change the Device Family to "iCE40"
+ d. Change the Device to "HX1K"
+ e. Change the Device Package to "VQ100"
+ f. Change all 4 of the voltages to 3.3
+ g. Hit Next
+3. Find the Verilog files (should be in the Components folder in the repository) and add them.
+4. Click Finish
+
+5. Click the little arrow to the left of "Add P&R files to expand it
+ a. Right click Constraint Files -> Add Files...
+ b. Go to the "res" folder in the repository and choose the .pcf file.
+6. At the top of iCEcube2, click Tool -> Run All to compile.
+7. If the log says the bitstream was created successfully, it compiled correctly.
+8. The machine code file is in the iCEcube project folder/Implmnt/sbt/outputs/bitmap, it's the only .bin file.
+9. Copy that .bin file over to <Our Repo>/bin. Leave iCEcube open so you can just click "Tool -> Run All" next time.
+
+10. Plug the GoBoard into your USB port.
+11. Open Lattice Diamond Programmer and hit OK if a cable is detected (Cable will have something)
+12. Wait until it's done scanning.
+13. Under "Device Family", click "Generic JTAG Device" until a dropdown appears. Select "iCE40"
+14. Do the same for "Device", but select "iCE40HX1K"
+15. Double click "Fast Program" under "Operation"
+
+16. Change the Access Mode from "CRAM Programming" to "SPI Flash Programming"
+17. Click the [...] after the Programming file field and select the .bin file (should be in <Our Repo>/bin)
+18. Change "Vendor" to "STMicro"
+19. !! IMPORTANT !! Change "Device" to "SPI-M25P05-A" (that is NOT the default option!)
+20. Click "Load from File"
+21. Click OK, and it will erase the last program and replace it with this one.
