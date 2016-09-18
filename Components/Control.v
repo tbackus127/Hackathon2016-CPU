@@ -131,6 +131,8 @@ module Project_7_Segment_Top
   reg rLED1 = 1'b0;
   reg rLED2 = 1'b0;
   
+  reg rSel = 1'b0;
+  
   reg [3:0] r_Count = 4'b0000;
   reg [3:0] r_A = 4'b0000;
   reg [3:0] r_B = 4'b0000;
@@ -187,7 +189,7 @@ module Project_7_Segment_Top
           r_Count <= 0;
         else 
           r_Count <= r_Count + 1;
-        rDisp <= r_Count;
+        rSel <= 1'b0;
       end
       
       // Set A to counter's value
@@ -208,8 +210,14 @@ module Project_7_Segment_Top
       if (w_Switch_3 == 1'b1 && r_Switch_4 == 1'b0)
       begin
         r_Res <= (r_A + r_B);
-        rDisp <= r_Count;
+        rSel <= 1'b1;
       end
+      
+      // 0: r_Count, 1: r_Res
+      if(rSel == 1'b0)
+        rDisp <= r_Count;
+      else
+        rDisp <= r_Res;
       
   end
   
