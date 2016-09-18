@@ -13,6 +13,7 @@ module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out co
   wire [15:0]adderResult;
   wire [15:0]moveResult;
   wire [15:0]jumpResult;
+  
 
   ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
   move (.[:0]R1, .[15:0]moveResult);
@@ -304,3 +305,55 @@ module memory(address, inreg, outreg);
     //assign [14]outreg = [14]reg8;
     //assign [15]outreg = [15]reg8;
 endmodule//memory
+
+module WriteToReg(
+		   RegNum,
+		   Data,
+		   RegList,
+		   Regs
+		   );
+
+   input  [2:0]  RegNum;
+   input  [15:0] Data;
+   input  [15:7] RegList;
+   output [15:7] Regs;
+   wire 	 Holder;
+   
+
+   assign Holder = (RegNum[2] == 0 
+		    ? (RegNum[1] == 0 
+		       ? (RegNum[0] == 0 
+			  ? 0       // {S2,S1,S0} = 3'b000
+			  : 1)      // {S2,S1,S0} = 3'b001
+		       : (RegNum[0] == 0 
+			  ? 2       // {S2,S1,S0} = 3'b010
+			  : 3))     // {S2,S1,S0} = 3'b011
+		    : (RegNum[1] == 0 
+		       ? (RegNum[0] == 0 
+			  ? 4       // {S2,S1,S0} = 3'b100
+			  : 5)      // {S2,S1,S0} = 3'b101
+		       : (RegNum[0] == 0 
+			  ? 6       // {S2,S1,S0} = 3'b110
+			  : 7)));   // {S2,S1,S0} = 3'b111
+
+   assign Regs = RegList;
+   assign Regs[0:Holder] = Data[0];
+   assign Regs[1:Holder] = Data[1];
+   assign Regs[2:Holder] = Data[2];
+   assign Regs[3:Holder] = Data[3];
+   assign Regs[4:Holder] = Data[4];
+   assign Regs[5:Holder] = Data[5];
+   assign Regs[6:Holder] = Data[6];
+   assign Regs[7:Holder] = Data[7];
+   assign Regs[8:Holder] = Data[8];
+   assign Regs[9:Holder] = Data[9];
+   assign Regs[10:Holder] = Data[10];
+   assign Regs[11:Holder] = Data[11];
+   assign Regs[12:Holder] = Data[12];
+   assign Regs[13:Holder] = Data[13];
+   assign Regs[14:Holder] = Data[14];
+   assign Regs[15:Holder] = Data[15];   
+   
+endmodule // WriteToReg
+
+   
