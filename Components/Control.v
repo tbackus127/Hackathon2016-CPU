@@ -10,45 +10,46 @@ module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out co
 
   reg [1:0]Carry;
   reg Overflow;
-  wire [15:0]adderResult;
+  wire [15:0]aluResult;
   wire [15:0]moveResult;
   wire [15:0]jumpResult;
-
-  ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
-  move (.[:0]R1, .[15:0]moveResult);
-  mux_31_1([4:0]opp,
-            16'b00,
-            [15:0]aluResult,//ADD
-            [15:0]aluResult,//ADC
-            [15:0]aluResult,//SUB
-            [15:0]aluResult,//SDC
-            [15:0]aluResult,//SBB
-            [15:0]aluResult,//AND
-            [15:0]aluResult,//OR
-            [15:0]aluResult,//XOR
-            [15:0]aluResult,//NOT
-            [15:0]aluResult,//SHFT
-            [15:0]moveResult,//MOV
-            16'b00,//[15:0]jumpResult,//JMP
-            16'b00,//[15:0]Result,//JGO
-            16'b00,//[15:0]Result,//JLO
-            16'b00,//[15:0]Result,//JEO
-            16'b00,//hlt
-            16'b00,//rst
-            [15:0]Result,//SETH
-            [15:0]Result,//SETL
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00,
-            16'b00);
+  wire [15:0]RESULT
+  //ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
+  //move (.[:0]R1, .[15:0]moveResult);
+  mux_31_1 MUX(.[4:0]opp,
+            .16'b00,
+            .[15:0]aluResult,//ADD
+            .[15:0]aluResult,//ADC
+            .[15:0]aluResult,//SUB
+            .[15:0]aluResult,//SDC
+            .[15:0]aluResult,//SBB
+            .[15:0]aluResult,//AND
+            .[15:0]aluResult,//OR
+            .[15:0]aluResult,//XOR
+            .[15:0]aluResult,//NOT
+            .[15:0]aluResult,//SHFT
+            .[15:0]moveResult,//MOV
+            .16'b00,//[15:0]jumpResult,//JMP
+            .16'b00,//[15:0]Result,//JGO
+            .16'b00,//[15:0]Result,//JLO
+            .16'b00,//[15:0]Result,//JEO
+            .16'b00,//hlt
+            .16'b00,//rst
+            .[15:0]Result,//SETH
+            .[15:0]Result,//SETL
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00,
+            .16'b00
+            .RESULT);
 endmodule//Control
 
 module mux_32_1 (
@@ -160,147 +161,38 @@ module memory(address, inreg, outreg);
   reg[15:5] reg6;
   reg[15:6] reg7;
   reg[15:7] reg8;
-//case of chosing bank 1
-  //assign [0]outreg = [0]reg1;
-  //assign [1]outreg = [1]reg1;
-  //assign [2]outreg = [2]reg1;
-  //assign [3]outreg = [3]reg1;
-  //assign [4]outreg = [4]reg1;
-  //assign [5]outreg = [5]reg1;
-  //assign [6]outreg = [6]reg1;
-  //assign [7]outreg = [7]reg1;
-  //assign [8]outreg = [8]reg1;
-  //assign [9]outreg = [9]reg1;
-  //assign [10]outreg = [10]reg1;
-  //assign [11]outreg = [11]reg1;
-  //assign [12]outreg = [12]reg1;
-  //assign [13]outreg = [13]reg1;
-  //assign [14]outreg = [14]reg1;
-  //assign [15]outreg = [15]reg1;
+//3-1MUX
+  mux_8_1(X, .[15:0]reg1, .[15:0]reg2, .[15:0]reg3, .[15:0]reg4, .[15:0]reg5, .[15:0]reg6, .[15:0]reg7, .[15:0]reg8, .[2:0]address);
 
-//case of chosing bank 2
-    //assign [0]outreg = [0]reg2;
-    //assign [1]outreg = [1]reg2;
-    //assign [2]outreg = [2]reg2;
-    //assign [3]outreg = [3]reg2;
-    //assign [4]outreg = [4]reg2;
-    //assign [5]outreg = [5]reg2;
-    //assign [6]outreg = [6]reg2;
-    //assign [7]outreg = [7]reg2;
-    //assign [8]outreg = [8]reg2;
-    //assign [9]outreg = [9]reg2;
-    //assign [10]outreg = [10]reg2;
-    //assign [11]outreg = [11]reg2;
-    //assign [12]outreg = [12]reg2;
-    //assign [13]outreg = [13]reg2;
-    //assign [14]outreg = [14]reg2;
-    //assign [15]outreg = [15]reg2;
-
-//case of chosing bank 3
-    //assign [0]outreg = [0]reg3;
-    //assign [1]outreg = [1]reg3;
-    //assign [2]outreg = [2]reg3;
-    //assign [3]outreg = [3]reg3;
-    //assign [4]outreg = [4]reg3;
-    //assign [5]outreg = [5]reg3;
-    //assign [6]outreg = [6]reg3;
-    //assign [7]outreg = [7]reg3;
-    //assign [8]outreg = [8]reg3;
-    //assign [9]outreg = [9]reg3;
-    //assign [10]outreg = [10]reg3;
-    //assign [11]outreg = [11]reg3;
-    //assign [12]outreg = [12]reg3;
-    //assign [13]outreg = [13]reg3;
-    //assign [14]outreg = [14]reg3;
-    //assign [15]outreg = [15]reg3;
-
-//case of chosing bank 4
-    //assign [0]outreg = [0]reg4;
-    //assign [1]outreg = [1]reg4;
-    //assign [2]outreg = [2]reg4;
-    //assign [3]outreg = [3]reg4;
-    //assign [4]outreg = [4]reg4;
-    //assign [5]outreg = [5]reg4;
-    //assign [6]outreg = [6]reg4;
-    //assign [7]outreg = [7]reg4;
-    //assign [8]outreg = [8]reg4;
-    //assign [9]outreg = [9]reg4;
-    //assign [10]outreg = [10]reg4;
-    //assign [11]outreg = [11]reg4;
-    //assign [12]outreg = [12]reg4;
-    //assign [13]outreg = [13]reg4;
-    //assign [14]outreg = [14]reg4;
-    //assign [15]outreg = [15]reg4;
-
-//case of chosing bank 5
-    //assign [0]outreg = [0]reg5;
-    //assign [1]outreg = [1]reg5;
-    //assign [2]outreg = [2]reg5;
-    //assign [3]outreg = [3]reg5;
-    //assign [4]outreg = [4]reg5;
-    //assign [5]outreg = [5]reg5;
-    //assign [6]outreg = [6]reg5;
-    //assign [7]outreg = [7]reg5;
-    //assign [8]outreg = [8]reg5;
-    //assign [9]outreg = [9]reg5;
-    //assign [10]outreg = [10]reg5;
-    //assign [11]outreg = [11]reg5;
-    //assign [12]outreg = [12]reg5;
-    //assign [13]outreg = [13]reg5;
-    //assign [14]outreg = [14]reg5;
-    //assign [15]outreg = [15]reg5;
-
-//case of chosing bank 6
-    //assign [0]outreg = [0]reg6;
-    //assign [1]outreg = [1]reg6;
-    //assign [2]outreg = [2]reg6;
-    //assign [3]outreg = [3]reg6;
-    //assign [4]outreg = [4]reg6;
-    //assign [5]outreg = [5]reg6;
-    //assign [6]outreg = [6]reg6;
-    //assign [7]outreg = [7]reg6;
-    //assign [8]outreg = [8]reg6;
-    //assign [9]outreg = [9]reg6;
-    //assign [10]outreg = [10]reg6;
-    //assign [11]outreg = [11]Reg6;
-    //assign [12]outreg = [12]reg6;
-    //assign [13]outreg = [13]reg6;
-    //assign [14]outreg = [14]reg6;
-    //assign [15]outreg = [15]reg6;
-
-//case of chosing bank 7
-    //assign [0]outreg = [0]reg7;
-    //assign [1]outreg = [1]reg7;
-    //assign [2]outreg = [2]reg7;
-    //assign [3]outreg = [3]reg7;
-    //assign [4]outreg = [4]reg7;
-    //assign [5]outreg = [5]reg7;
-    //assign [6]outreg = [6]reg7;
-    //assign [7]outreg = [7]reg7;
-    //assign [8]outreg = [8]reg7;
-    //assign [9]outreg = [9]reg7;
-    //assign [10]outreg = [10]reg7;
-    //assign [11]outreg = [11]reg7;
-    //assign [12]outreg = [12]reg7;
-    //assign [13]outreg = [13]reg7;
-    //assign [14]outreg = [14]reg7;
-    //assign [15]outreg = [15]reg7;
-
-//case of chosing bank 8
-    //assign [0]outreg = [0]reg8;
-    //assign [1]outreg = [1]reg8;
-    //assign [2]outreg = [2]reg8;
-    //assign [3]outreg = [3]reg8;
-    //assign [4]outreg = [4]reg8;
-    //assign [5]outreg = [5]reg8;
-    //assign [6]outreg = [6]reg8;
-    //assign [7]outreg = [7]reg8;
-    //assign [8]outreg = [8]reg8;
-    //assign [9]outreg = [9]reg8;
-    //assign [10]outreg = [10]reg8;
-    //assign [11]outreg = [11]reg8;
-    //assign [12]outreg = [12]reg8;
-    //assign [13]outreg = [13]reg8;
-    //assign [14]outreg = [14]reg8;
-    //assign [15]outreg = [15]reg8;
 endmodule//memory
+
+module mux_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
+   output [15:0] X;   // The output line
+
+   input [15:0]  A7;  // Input line with id 3'b111
+   input [15:0]  A6;  // Input line with id 3'b110
+   input [15:0]  A5;  // Input line with id 3'b101
+   input [15:0]  A4;  // Input line with id 3'b100
+   input [15:0]  A3;  // Input line with id 3'b011
+   input [15:0]  A2;  // Input line with id 3'b010
+   input [15:0]  A1;  // Input line with id 3'b001
+   input [15:0]  A0;  // Input line with id 3'b000
+   input [2:0]	      S;
+
+   assign X = (S[2] == 0
+	       ? (S[1] == 0
+		  ? (S[0] == 0
+		     ? A0       // {S2,S1,S0} = 3'b000
+		     : A1)      // {S2,S1,S0} = 3'b001
+		  : (S[0] == 0
+		     ? A2       // {S2,S1,S0} = 3'b010
+		     : A3))     // {S2,S1,S0} = 3'b011
+	       : (S[1] == 0
+		  ? (S[0] == 0
+		     ? A4       // {S2,S1,S0} = 3'b100
+		     : A5)      // {S2,S1,S0} = 3'b101
+		  : (S[0] == 0
+		     ? A6       // {S2,S1,S0} = 3'b110
+		     : A7)));   // {S2,S1,S0} = 3'b111
+endmodule
+ // multiplexer_8_1
