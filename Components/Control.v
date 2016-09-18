@@ -1,301 +1,306 @@
-//-----------------------------------------------------------------------------
-// GoBoard Control module
-//-----------------------------------------------------------------------------
+////////Control unit
 
-//-----------------------------------------------------------------------------
-// Converts binary to 7-Segment encoding
-//-----------------------------------------------------------------------------
-module Binary_To_7Segment 
-  (
-   input       i_Clk,
-   input [7:0] i_Binary_Num,
-   output      o_Segment1_A,
-   output      o_Segment1_B,
-   output      o_Segment1_C,
-   output      o_Segment1_D,
-   output      o_Segment1_E,
-   output      o_Segment1_F,
-   output      o_Segment1_G,
-   output      o_Segment2_A,
-   output      o_Segment2_B,
-   output      o_Segment2_C,
-   output      o_Segment2_D,
-   output      o_Segment2_E,
-   output      o_Segment2_F,
-   output      o_Segment2_G
-   );
+module Contorl(opp, R1, R2, QR, RES);//takes in program counter and sends out control back to to program counter and ALU
+//Declare inputs and outputs
+  input [4:0]opp;//
+  input [2:0]R1;
+  input [2:0]R2;
+  input [2:0]QR;
+  input [1:0]RES;
 
-  reg [6:0]    r_Hex_Encoding1 = 7'h00;
-  reg [6:0]    r_Hex_Encoding2 = 7'h00;
-  
-  reg [3:0]    rNumMSB = 4'b0000;
-  reg [3:0]    rNumLSB = 4'b0000;
-  
-  // Purpose: Creates a case statement for all possible input binary numbers.
-  // Drives r_Hex_Encoding appropriately for each input combination.
-  always @(posedge i_Clk)
-    begin
-    rNumLSB <= (i_Binary_Num[3:0]);
-    rNumMSB <= (i_Binary_Num[7:4]);
-      case (rNumMSB)
-        4'b0000 : r_Hex_Encoding1 <= 7'h7E;
-        4'b0001 : r_Hex_Encoding1 <= 7'h30;
-        4'b0010 : r_Hex_Encoding1 <= 7'h6D;
-        4'b0011 : r_Hex_Encoding1 <= 7'h79;
-        4'b0100 : r_Hex_Encoding1 <= 7'h33;          
-        4'b0101 : r_Hex_Encoding1 <= 7'h5B;
-        4'b0110 : r_Hex_Encoding1 <= 7'h5F;
-        4'b0111 : r_Hex_Encoding1 <= 7'h70;
-        4'b1000 : r_Hex_Encoding1 <= 7'h7F;
-        4'b1001 : r_Hex_Encoding1 <= 7'h7B;
-        4'b1010 : r_Hex_Encoding1 <= 7'h77;
-        4'b1011 : r_Hex_Encoding1 <= 7'h1F;
-        4'b1100 : r_Hex_Encoding1 <= 7'h4E;
-        4'b1101 : r_Hex_Encoding1 <= 7'h3D;
-        4'b1110 : r_Hex_Encoding1 <= 7'h4F;
-        4'b1111 : r_Hex_Encoding1 <= 7'h47;
-      endcase
-      case (rNumLSB)
-        4'b0000 : r_Hex_Encoding2 <= 7'h7E;
-        4'b0001 : r_Hex_Encoding2 <= 7'h30;
-        4'b0010 : r_Hex_Encoding2 <= 7'h6D;
-        4'b0011 : r_Hex_Encoding2 <= 7'h79;
-        4'b0100 : r_Hex_Encoding2 <= 7'h33;          
-        4'b0101 : r_Hex_Encoding2 <= 7'h5B;
-        4'b0110 : r_Hex_Encoding2 <= 7'h5F;
-        4'b0111 : r_Hex_Encoding2 <= 7'h70;
-        4'b1000 : r_Hex_Encoding2 <= 7'h7F;
-        4'b1001 : r_Hex_Encoding2 <= 7'h7B;
-        4'b1010 : r_Hex_Encoding2 <= 7'h77;
-        4'b1011 : r_Hex_Encoding2 <= 7'h1F;
-        4'b1100 : r_Hex_Encoding2 <= 7'h4E;
-        4'b1101 : r_Hex_Encoding2 <= 7'h3D;
-        4'b1110 : r_Hex_Encoding2 <= 7'h4F;
-        4'b1111 : r_Hex_Encoding2 <= 7'h47;
-      endcase
-    end // always @ (posedge i_Clk)
+  reg [1:0]Carry;
+  reg Overflow;
+  wire [15:0]adderResult;
+  wire [15:0]moveResult;
+  wire [15:0]jumpResult;
 
-  // r_Hex_Encoding[7] is unused
-  assign o_Segment2_A = r_Hex_Encoding2[6];
-  assign o_Segment2_B = r_Hex_Encoding2[5];
-  assign o_Segment2_C = r_Hex_Encoding2[4];
-  assign o_Segment2_D = r_Hex_Encoding2[3];
-  assign o_Segment2_E = r_Hex_Encoding2[2];
-  assign o_Segment2_F = r_Hex_Encoding2[1];
-  assign o_Segment2_G = r_Hex_Encoding2[0];
-  assign o_Segment1_A = r_Hex_Encoding1[6];
-  assign o_Segment1_B = r_Hex_Encoding1[5];
-  assign o_Segment1_C = r_Hex_Encoding1[4];
-  assign o_Segment1_D = r_Hex_Encoding1[3];
-  assign o_Segment1_E = r_Hex_Encoding1[2];
-  assign o_Segment1_F = r_Hex_Encoding1[1];
-  assign o_Segment1_G = r_Hex_Encoding1[0];
+  ALU(.[15:0]R1, .[15:0]R2, [15:0]aluResult);
+  move (.[:0]R1, .[15:0]moveResult);
+  mux_31_1([4:0]opp,
+            16'b00,
+            [15:0]aluResult,//ADD
+            [15:0]aluResult,//ADC
+            [15:0]aluResult,//SUB
+            [15:0]aluResult,//SDC
+            [15:0]aluResult,//SBB
+            [15:0]aluResult,//AND
+            [15:0]aluResult,//OR
+            [15:0]aluResult,//XOR
+            [15:0]aluResult,//NOT
+            [15:0]aluResult,//SHFT
+            [15:0]moveResult,//MOV
+            16'b00,//[15:0]jumpResult,//JMP
+            16'b00,//[15:0]Result,//JGO
+            16'b00,//[15:0]Result,//JLO
+            16'b00,//[15:0]Result,//JEO
+            16'b00,//hlt
+            16'b00,//rst
+            [15:0]Result,//SETH
+            [15:0]Result,//SETL
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00,
+            16'b00);
+endmodule//Control
 
-endmodule
+module mux_32_1 (
+		 Control,
+		 A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12,
+		 A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23,
+		 A24, A25, A26, A27, A28, A29, A30, A31, Result);
 
-//-----------------------------------------------------------------------------
-// Switch Debouncing
-//-----------------------------------------------------------------------------
+   input  [15:0] A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12,
+		 A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, A23,
+		 A24, A25, A26, A27, A28, A29, A30, A31;
+   input  [4:0]  Control;
+   output [15:0] Result;
 
-module Debounce_Switch (input i_Clk, input i_Switch, output o_Switch);
+   assign Result = (Control[4] == 0
+		    ?(Control[3] == 0
+		      ?(Control[2] == 0
+			?(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A0             //5'b00000
+			    : A1)            //5'b00001
+			  :(Control[0] == 0
+			    ? A2             //5'b00010
+			    : A3)
+			  )           //5'b00011
+			:(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A4             //5'b00100
+			    : A5)            //5'b00101
+			  :(Control[0] == 0
+			    ? A6             //5'b00110
+			    : A7)
+			  )
+			)          //5'b00111
+		      :(Control[2] == 0
+			?(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A8             //5'b01000
+			    : A9)            //5'b01001
+			  :(Control[0] == 0
+			    ? A10            //5'b01010
+			    : A11)
+			  )          //5'b01011
+			:(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A12            //5'b01100
+			    : A13)           //5'b01101
+			  :(Control[0] == 0
+			    ? A14            //5'b01110
+			    : A15)
+			  )
+			)
+		      )         //5'b01111
+		    :(Control[3] == 0
+		      ?(Control[2] == 0
+			?(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A16              //5'b10000
+			    : A17)             //5'b10001
+			  :(Control[0] == 0
+			    ? A18              //5'b10010
+			    : A19)
+			  )            //5'b10011
+			:(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A20              //5'b10100
+			    : A21)             //5'b10101
+			  :(Control[0] == 0
+			    ? A22              //5'b10110
+			    : A23)
+			  )
+			)
+		                //5'b10111
+		    :(Control[2] == 0
+			?(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A24              //5'b11000
+			    : A25)             //5'b11001
+			  :(Control[0] == 0
+			    ? A26              //5'b11010
+			    : A27)
+			  )            //5'b11011
+			:(Control[1] == 0
+			  ?(Control[0] == 0
+			    ? A28              //5'b11100
+			    : A29)             //5'b11101
+			  :(Control[0] == 0
+			    ? A30              //5'b11110
+			    : A31)
+			  )
+		      )
+		      )
+		    )       //5'b11111
+		    ;
+endmodule // mux_32_1
 
-  parameter c_DEBOUNCE_LIMIT = 250000;  // 10 ms at 25 MHz
-  
-  reg [17:0] r_Count = 0;
-  reg r_State = 1'b0;
+module memory(address, inreg, outreg);
+  input [2:0] address;
+  input [15:0]inreg;
+  output [15:0]outreg;
 
-  always @(posedge i_Clk)
-  begin
-    // Switch input is different than internal switch value, so an input is
-    // changing.  Increase the counter until it is stable for enough time.	
-    if (i_Switch !== r_State && r_Count < c_DEBOUNCE_LIMIT)
-      r_Count <= r_Count + 1;
+  reg[15:7]registers;
 
-    // End of counter reached, switch is stable, register it, reset counter
-    else if (r_Count == c_DEBOUNCE_LIMIT)
-    begin
-      r_State <= i_Switch;
-      r_Count <= 0;
-    end  
+  reg[15:0] reg1;
+  reg[15:1] reg2;
+  reg[15:2] reg3;
+  reg[15:3] reg4;
+  reg[15:3] reg4;
+  reg[15:5] reg6;
+  reg[15:6] reg7;
+  reg[15:7] reg8;
+//case of chosing bank 1
+  //assign [0]outreg = [0]reg1;
+  //assign [1]outreg = [1]reg1;
+  //assign [2]outreg = [2]reg1;
+  //assign [3]outreg = [3]reg1;
+  //assign [4]outreg = [4]reg1;
+  //assign [5]outreg = [5]reg1;
+  //assign [6]outreg = [6]reg1;
+  //assign [7]outreg = [7]reg1;
+  //assign [8]outreg = [8]reg1;
+  //assign [9]outreg = [9]reg1;
+  //assign [10]outreg = [10]reg1;
+  //assign [11]outreg = [11]reg1;
+  //assign [12]outreg = [12]reg1;
+  //assign [13]outreg = [13]reg1;
+  //assign [14]outreg = [14]reg1;
+  //assign [15]outreg = [15]reg1;
 
-    // Switches are the same state, reset the counter
-    else
-      r_Count <= 0;
-  end
+//case of chosing bank 2
+    //assign [0]outreg = [0]reg2;
+    //assign [1]outreg = [1]reg2;
+    //assign [2]outreg = [2]reg2;
+    //assign [3]outreg = [3]reg2;
+    //assign [4]outreg = [4]reg2;
+    //assign [5]outreg = [5]reg2;
+    //assign [6]outreg = [6]reg2;
+    //assign [7]outreg = [7]reg2;
+    //assign [8]outreg = [8]reg2;
+    //assign [9]outreg = [9]reg2;
+    //assign [10]outreg = [10]reg2;
+    //assign [11]outreg = [11]reg2;
+    //assign [12]outreg = [12]reg2;
+    //assign [13]outreg = [13]reg2;
+    //assign [14]outreg = [14]reg2;
+    //assign [15]outreg = [15]reg2;
 
-  // Assign internal register to output (debounced!)
-  assign o_Switch = r_State;
+//case of chosing bank 3
+    //assign [0]outreg = [0]reg3;
+    //assign [1]outreg = [1]reg3;
+    //assign [2]outreg = [2]reg3;
+    //assign [3]outreg = [3]reg3;
+    //assign [4]outreg = [4]reg3;
+    //assign [5]outreg = [5]reg3;
+    //assign [6]outreg = [6]reg3;
+    //assign [7]outreg = [7]reg3;
+    //assign [8]outreg = [8]reg3;
+    //assign [9]outreg = [9]reg3;
+    //assign [10]outreg = [10]reg3;
+    //assign [11]outreg = [11]reg3;
+    //assign [12]outreg = [12]reg3;
+    //assign [13]outreg = [13]reg3;
+    //assign [14]outreg = [14]reg3;
+    //assign [15]outreg = [15]reg3;
 
-endmodule
+//case of chosing bank 4
+    //assign [0]outreg = [0]reg4;
+    //assign [1]outreg = [1]reg4;
+    //assign [2]outreg = [2]reg4;
+    //assign [3]outreg = [3]reg4;
+    //assign [4]outreg = [4]reg4;
+    //assign [5]outreg = [5]reg4;
+    //assign [6]outreg = [6]reg4;
+    //assign [7]outreg = [7]reg4;
+    //assign [8]outreg = [8]reg4;
+    //assign [9]outreg = [9]reg4;
+    //assign [10]outreg = [10]reg4;
+    //assign [11]outreg = [11]reg4;
+    //assign [12]outreg = [12]reg4;
+    //assign [13]outreg = [13]reg4;
+    //assign [14]outreg = [14]reg4;
+    //assign [15]outreg = [15]reg4;
 
-//-----------------------------------------------------------------------------
-// Main program
-//-----------------------------------------------------------------------------
+//case of chosing bank 5
+    //assign [0]outreg = [0]reg5;
+    //assign [1]outreg = [1]reg5;
+    //assign [2]outreg = [2]reg5;
+    //assign [3]outreg = [3]reg5;
+    //assign [4]outreg = [4]reg5;
+    //assign [5]outreg = [5]reg5;
+    //assign [6]outreg = [6]reg5;
+    //assign [7]outreg = [7]reg5;
+    //assign [8]outreg = [8]reg5;
+    //assign [9]outreg = [9]reg5;
+    //assign [10]outreg = [10]reg5;
+    //assign [11]outreg = [11]reg5;
+    //assign [12]outreg = [12]reg5;
+    //assign [13]outreg = [13]reg5;
+    //assign [14]outreg = [14]reg5;
+    //assign [15]outreg = [15]reg5;
 
-module Project_7_Segment_Top
-  (input  i_Clk,      // Main Clock (25 MHz)
-   input  i_Switch_1,   // Increment counter
-   input  i_Switch_2,   // Set A
-   input  i_Switch_3,   // Add & Display
-   input  i_Switch_4,   // Set B
-   output o_Segment2_A,
-   output o_Segment2_B,
-   output o_Segment2_C,
-   output o_Segment2_D,
-   output o_Segment2_E,
-   output o_Segment2_F,
-   output o_Segment2_G,
-   output o_LED_1,
-   output o_LED_2,
-   output o_Segment1_A,
-   output o_Segment1_B,
-   output o_Segment1_C,
-   output o_Segment1_D,
-   output o_Segment1_E,
-   output o_Segment1_F,
-   output o_Segment1_G
-   );
+//case of chosing bank 6
+    //assign [0]outreg = [0]reg6;
+    //assign [1]outreg = [1]reg6;
+    //assign [2]outreg = [2]reg6;
+    //assign [3]outreg = [3]reg6;
+    //assign [4]outreg = [4]reg6;
+    //assign [5]outreg = [5]reg6;
+    //assign [6]outreg = [6]reg6;
+    //assign [7]outreg = [7]reg6;
+    //assign [8]outreg = [8]reg6;
+    //assign [9]outreg = [9]reg6;
+    //assign [10]outreg = [10]reg6;
+    //assign [11]outreg = [11]Reg6;
+    //assign [12]outreg = [12]reg6;
+    //assign [13]outreg = [13]reg6;
+    //assign [14]outreg = [14]reg6;
+    //assign [15]outreg = [15]reg6;
 
-  wire w_Switch_1;
-  wire w_Switch_2;
-  wire w_Switch_3;
-  wire w_Switch_4;
-  
-  reg  r_Switch_1 = 1'b0;
-  reg  r_Switch_2 = 1'b0;
-  reg  r_Switch_3 = 1'b0;
-  reg  r_Switch_4 = 1'b0;
-  
-  reg rLED1 = 1'b0;
-  reg rLED2 = 1'b0;
-  
-  reg rSel = 1'b0;
-  
-  reg [7:0] r_Count = 4'b0000;
-  reg [7:0] r_A = 4'b0000;
-  reg [7:0] r_B = 4'b0000;
-  reg [7:0] r_Res = 4'b0000;
-  reg [7:0] rDisp = 4'b0000;
-  
-  wire w_Segment1_A;
-  wire w_Segment1_B;
-  wire w_Segment1_C;
-  wire w_Segment1_D;
-  wire w_Segment1_E;
-  wire w_Segment1_F;
-  wire w_Segment1_G;
-  wire w_Segment2_A;
-  wire w_Segment2_B;
-  wire w_Segment2_C;
-  wire w_Segment2_D;
-  wire w_Segment2_E;
-  wire w_Segment2_F;
-  wire w_Segment2_G;
+//case of chosing bank 7
+    //assign [0]outreg = [0]reg7;
+    //assign [1]outreg = [1]reg7;
+    //assign [2]outreg = [2]reg7;
+    //assign [3]outreg = [3]reg7;
+    //assign [4]outreg = [4]reg7;
+    //assign [5]outreg = [5]reg7;
+    //assign [6]outreg = [6]reg7;
+    //assign [7]outreg = [7]reg7;
+    //assign [8]outreg = [8]reg7;
+    //assign [9]outreg = [9]reg7;
+    //assign [10]outreg = [10]reg7;
+    //assign [11]outreg = [11]reg7;
+    //assign [12]outreg = [12]reg7;
+    //assign [13]outreg = [13]reg7;
+    //assign [14]outreg = [14]reg7;
+    //assign [15]outreg = [15]reg7;
 
-  // Instantiate Debounce Filter
-  Debounce_Switch Debounce_Switch_Inst1
-    (.i_Clk(i_Clk),
-     .i_Switch(i_Switch_1),
-     .o_Switch(w_Switch_1));
-  Debounce_Switch Debounce_Switch_Inst2
-    (.i_Clk(i_Clk),
-     .i_Switch(i_Switch_2),
-     .o_Switch(w_Switch_2));
-  Debounce_Switch Debounce_Switch_Inst3
-    (.i_Clk(i_Clk),
-     .i_Switch(i_Switch_3),
-     .o_Switch(w_Switch_3));
-  Debounce_Switch Debounce_Switch_Inst4
-    (.i_Clk(i_Clk),
-     .i_Switch(i_Switch_4),
-     .o_Switch(w_Switch_4));
-     
-	  
-  // Purpose: When Switch is pressed, increment counter.
-  // When counter gets to F, start it back at 0 again.
-  always @(posedge i_Clk)
-  begin
-    r_Switch_1 <= w_Switch_1;
-    r_Switch_2 <= w_Switch_2;
-    r_Switch_3 <= w_Switch_3;
-    r_Switch_4 <= w_Switch_4;
-	  
-      // Increment Count when switch is pushed down
-      if (w_Switch_1 == 1'b1 && r_Switch_1 == 1'b0)
-      begin
-        if (r_Count == 256)
-          r_Count <= 0;
-        else 
-          r_Count <= r_Count + 1;
-        rSel <= 1'b0;
-      end
-      
-      // Set A to counter's value
-      if (w_Switch_2 == 1'b1 && r_Switch_2 == 1'b0)
-      begin
-        r_A <= r_Count;
-        rLED1 <= 1'b1;
-      end
-      
-      // Set B to counter's value
-      if (w_Switch_4 == 1'b1 && r_Switch_4 == 1'b0)
-      begin
-        r_B <= r_Count;
-        rLED2 <= 1'b1;
-      end
-      
-      // Add and display
-      if (w_Switch_3 == 1'b1 && r_Switch_3 == 1'b0)
-      begin
-        r_Res <= (r_A + r_B);
-        rSel <= 1'b1;
-      end
-      
-      // 0: r_Count, 1: r_Res
-      if(rSel == 1'b0)
-        rDisp <= r_Count;
-      else
-        rDisp <= r_Res;
-      
-  end
-  
-  // Instantiate Binary to 7-Segment Converter
-
-  Binary_To_7Segment Inst
-  (.i_Clk(i_Clk),
-   .i_Binary_Num(rDisp),
-   .o_Segment2_A(w_Segment2_A),
-   .o_Segment2_B(w_Segment2_B),
-   .o_Segment2_C(w_Segment2_C),
-   .o_Segment2_D(w_Segment2_D),
-   .o_Segment2_E(w_Segment2_E),
-   .o_Segment2_F(w_Segment2_F),
-   .o_Segment2_G(w_Segment2_G),
-   .o_Segment1_A(w_Segment1_A),
-   .o_Segment1_B(w_Segment1_B),
-   .o_Segment1_C(w_Segment1_C),
-   .o_Segment1_D(w_Segment1_D),
-   .o_Segment1_E(w_Segment1_E),
-   .o_Segment1_F(w_Segment1_F),
-   .o_Segment1_G(w_Segment1_G)
-   );
-  
-  assign o_Segment2_A = ~w_Segment2_A;
-  assign o_Segment2_B = ~w_Segment2_B;
-  assign o_Segment2_C = ~w_Segment2_C;
-  assign o_Segment2_D = ~w_Segment2_D;
-  assign o_Segment2_E = ~w_Segment2_E;
-  assign o_Segment2_F = ~w_Segment2_F;
-  assign o_Segment2_G = ~w_Segment2_G;
-  assign o_Segment1_A = ~w_Segment1_A;
-  assign o_Segment1_B = ~w_Segment1_B;
-  assign o_Segment1_C = ~w_Segment1_C;
-  assign o_Segment1_D = ~w_Segment1_D;
-  assign o_Segment1_E = ~w_Segment1_E;
-  assign o_Segment1_F = ~w_Segment1_F;
-  assign o_Segment1_G = ~w_Segment1_G;
-  
-  assign o_LED_1 = ~rLED1;
-  assign o_LED_2 = ~rLED2;
-  
-endmodule
+//case of chosing bank 8
+    //assign [0]outreg = [0]reg8;
+    //assign [1]outreg = [1]reg8;
+    //assign [2]outreg = [2]reg8;
+    //assign [3]outreg = [3]reg8;
+    //assign [4]outreg = [4]reg8;
+    //assign [5]outreg = [5]reg8;
+    //assign [6]outreg = [6]reg8;
+    //assign [7]outreg = [7]reg8;
+    //assign [8]outreg = [8]reg8;
+    //assign [9]outreg = [9]reg8;
+    //assign [10]outreg = [10]reg8;
+    //assign [11]outreg = [11]reg8;
+    //assign [12]outreg = [12]reg8;
+    //assign [13]outreg = [13]reg8;
+    //assign [14]outreg = [14]reg8;
+    //assign [15]outreg = [15]reg8;
+endmodule//memory
