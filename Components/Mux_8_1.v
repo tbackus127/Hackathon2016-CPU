@@ -1,3 +1,10 @@
+/*
+ * ------------------------------------------------------------------
+ * 8 to 1 multiplexorby Eric Sashaug
+ * ------------------------------------------------------------------ * 
+ */
+
+
 module mux_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);   
    output [15:0] X;   // The output line
 
@@ -9,7 +16,7 @@ module mux_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
    input [15:0]  A2;  // Input line with id 3'b010
    input [15:0]  A1;  // Input line with id 3'b001
    input [15:0]  A0;  // Input line with id 3'b000
-   input [2:0]	      S;   
+   input [2:0]	 S;   
 
    assign X = (S[2] == 0 
 	       ? (S[1] == 0 

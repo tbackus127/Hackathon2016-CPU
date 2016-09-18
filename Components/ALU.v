@@ -1,6 +1,8 @@
 /*
  * ----------------------------------------------------
  * The ALU and all of its nonsense
+ * Mainly pulled from here: http://barrywatson.se/dd/dd_alu.html
+ * With extra code from Eric Sakshaug
  * ----------------------------------------------------
  */
 
