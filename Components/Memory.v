@@ -22,8 +22,9 @@ module Reg16(reset, CLK, D, Q);
 
   always @ (posedge CLK)
     if(RES)
-      wRegOut <= 0; //Non-blocking set to 0
+      wRegOut = 0; 
     else
-      wRegOut <= wRegIn; //Non-blocking set to the input
+      wRegOut = wRegIn; 
 
-endmodule
+endmodule; // Reg16
+
