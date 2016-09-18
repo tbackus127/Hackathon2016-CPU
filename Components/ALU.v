@@ -196,6 +196,7 @@ module carry_select_adder(
    output 	  Carry;      // The 1-bit carry.
    output 	  Overflow;   // The 1-bit overflow status.
 
+   
    wire [3:0] 	S1_0;   // Nibble 1 sum output with carry input 0.
    wire [3:0] 	S1_1;   // Nibble 1 sum output with carry input 1.
    wire [3:0] 	S2_0;   // Nibble 2 sum output with carry input 0.
@@ -218,23 +219,48 @@ module carry_select_adder(
    wire 	V2_1;   // Nibble 2 overflow output with carry input 1.
    wire 	V3_0;   // Nibble 3 overflow output with carry input 0.
    wire 	V3_1;   // Nibble 3 overflow output with carry input 1.
-   
-   ripple_carry_adder rc_nibble_0(S[3:0], C0, V0, A[3:0], B[3:0], Cin);          // Calculate S nibble 0.
-   ripple_carry_adder rc_nibble_1_carry_0(S1_0, C1_0, V1_0, A[7:4], B[7:4], 0);      // Calculate S nibble 1 with carry input 0.
-   ripple_carry_adder rc_nibble_1_carry_1(S1_1, C1_1, V1_1, A[7:4], B[7:4], 1);      // Calculate S nibble 1 with carry input 1.
-   ripple_carry_adder rc_nibble_2_carry_0(S2_0, C2_0, V2_0, A[11:8], B[11:8], 0);    // Calculate S nibble 2 with carry input 0.
-   ripple_carry_adder rc_nibble_2_carry_1(S2_1, C2_1, V2_1, A[11:8], B[11:8], 1);    // Calculate S nibble 2 with carry input 1.
-   ripple_carry_adder rc_nibble_3_carry_0(S3_0, C3_0, V3_0, A[15:12], B[15:12], 0);  // Calculate S nibble 3 with carry input 0.
-   ripple_carry_adder rc_nibble_3_carry_1(S3_1, C3_1, V3_1, A[15:12], B[15:12], 1);  // Calculate S nibble 3 with carry input 1.
 
-   multiplexer_2_1 #(1) muxc1(C1, C1_0, C1_1, C0); // C0 selects the carry output for nibble 1.
-   multiplexer_2_1 #(1) muxc2(C2, C2_0, C2_1, C1); // C1 selects the carry output for nibble 2.
-   multiplexer_2_1 #(1) muxc(C, C3_0, C3_1, C2);   // C2 selects the carry output for nibble 3 which is the global carry output.
-   multiplexer_2_1 #(1) muxv(V, V3_0, V3_1, C2);   // C2 selects the overflow output for nibble 3 which is the global overflow output.
-   
-   multiplexer_2_1 #(4) muxs1(S[7:4], S1_0, S1_1, C0);    // C0 selects the result for nibble 1.
-   multiplexer_2_1 #(4) muxs2(S[11:8], S2_0, S2_1, C1);   // C1 selects the result for nibble 2.
-   multiplexer_2_1 #(4) muxs3(S[15:12], S3_0, S3_1, C2);  // C2 selects the result for nibble 3.
+   // Calculate S nibble 0.
+   ripple_carry_adder rc_nibble_0(S[3:0], C0, V0, A[3:0], B[3:0], Cin);
+
+   // Calculate S nibble 1 with carry input 0.
+   ripple_carry_adder rc_nibble_1_carry_0(S1_0, C1_0, V1_0, A[7:4], B[7:4], 0);
+
+   // Calculate S nibble 1 with carry input 1.
+   ripple_carry_adder rc_nibble_1_carry_1(S1_1, C1_1, V1_1, A[7:4], B[7:4], 1);
+
+   // Calculate S nibble 2 with carry input 0.
+   ripple_carry_adder rc_nibble_2_carry_0(S2_0, C2_0, V2_0, A[11:8], B[11:8], 0);  
+
+   // Calculate S nibble 2 with carry input 1.  
+   ripple_carry_adder rc_nibble_2_carry_1(S2_1, C2_1, V2_1, A[11:8], B[11:8], 1);  
+
+   // Calculate S nibble 3 with carry input 0.
+   ripple_carry_adder rc_nibble_3_carry_0(S3_0, C3_0, V3_0, A[15:12], B[15:12], 0);
+
+   // Calculate S nibble 3 with carry input 1.
+   ripple_carry_adder rc_nibble_3_carry_1(S3_1, C3_1, V3_1, A[15:12], B[15:12], 1);  
+
+   // C0 selects the carry output for nibble 1.
+   multiplexer_2_1 #(1) muxc1(C1, C1_0, C1_1, C0);
+
+   // C1 selects the carry output for nibble 2.
+   multiplexer_2_1 #(1) muxc2(C2, C2_0, C2_1, C1);
+
+   // C2 selects the carry output for nibble 3 which is the global carry output.
+   multiplexer_2_1 #(1) muxc(C, C3_0, C3_1, C2);
+
+   // C2 selects the overflow output for nibble 3 which is the global overflow output.
+   multiplexer_2_1 #(1) muxv(V, V3_0, V3_1, C2);   
+
+   // C0 selects the result for nibble 1.
+   multiplexer_2_1 #(4) muxs1(S[7:4], S1_0, S1_1, C0); 
+
+   // C1 selects the result for nibble 2
+   multiplexer_2_1 #(4) muxs2(S[11:8], S2_0, S2_1, C1);
+
+   // C2 selects the result for nibble 3.
+   multiplexer_2_1 #(4) muxs3(S[15:12], S3_0, S3_1, C2);  
 endmodule // carry_select_adder
 
 module ripple_carry_adder(S, C, V, A, B, Cin);
@@ -319,3 +345,35 @@ module multiplexer_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
 		     ? A6       // {S2,S1,S0} = 3'b110
 		     : A7)));   // {S2,S1,S0} = 3'b111
 endmodule // multiplexer_8_1	   
+
+module IsEqual(
+	       OperandA,
+	       OperandB,
+	       Result);
+
+   input [15:0] OperandA;
+   input [15:0] OperandA;
+   output       Result;
+   reg   [15:0] Holder;
+   
+   XorOp xor(OperandA, OperandB, Holder);
+   assign Result = 0;
+   or(Result, Result, Holder[0]);
+   or(Result, Result, Holder[1]);
+   or(Result, Result, Holder[2]);
+   or(Result, Result, Holder[3]);
+   or(Result, Result, Holder[4]);
+   or(Result, Result, Holder[5];
+   or(Result, Result, Holder[6]);
+   or(Result, Result, Holder[7]);
+   or(Result, Result, Holder[8]);
+   or(Result, Result, Holder[9]);
+   or(Result, Result, Holder[10]);
+   or(Result, Result, Holder[11]);
+   or(Result, Result, Holder[12]);
+   or(Result, Result, Holder[13]);
+   or(Result, Result, Holder[14]);
+   or(Result, Result, Holder[15]);
+
+   not(Result,Result);
+endmodule // IsEqual
