@@ -1,6 +1,6 @@
 /*
  * ----------------------------------------------------
- * Implementation of basic logic
+ * The ALU and all of its nonsense
  * ----------------------------------------------------
  */
 module ALU(
@@ -8,7 +8,6 @@ module ALU(
 	   OperandA,
 	   OperandB,
 	   Carry,
-	   Negative,
 	   Overflow,
 	   Result);
    
@@ -18,7 +17,6 @@ module ALU(
    input [15:0]  OperandB;
 
    output        Carry;
-   output        Negative;
    output        Overflow;
    output [15:0] Result;
    
