@@ -1,4 +1,5 @@
-The simplest way is to instantiate in the main section of top, creating a named instance and wiring the ports up in order:
+The simplest way is to instantiate in the main section of top,
+creating a named instance and wiring the ports up in order:
 
 <code>
 module top(
@@ -16,7 +17,12 @@ subcomponent subcomponent_instance_name (
 endmodule
 </code>
 
-This has a few draw backs especially regarding the port order of the subcomponent code. simple refactoring here can break connectivity or change behaviour. for example if some one else fixs a bug and reorders the ports for some reason, switching the clk and reset order. There will be no connectivity issue from your compiler but will not work as intended.
+This has a few draw backs especially regarding the port order of the
+subcomponent code. simple refactoring here can break connectivity or
+change behaviour. for example if some one else fixs a bug and reorders
+the ports for some reason, switching the clk and reset order. There
+will be no connectivity issue from your compiler but will not work as
+intended.
 
 <code>
 module subcomponent(
@@ -25,7 +31,8 @@ module subcomponent(
   ...
 </code>
 
-It is therefore recommended to connect using named ports, this also helps tracing connectivity of wires in the code.
+It is therefore recommended to connect using named ports, this also
+helps tracing connectivity of wires in the code.
 
 <code>
 module top(
@@ -43,7 +50,8 @@ subcomponent subcomponent_instance_name (
 endmodule
 </code>
 
-Giving each port its own line and indenting correctly adds to the readability and code quality.
+Giving each port its own line and indenting correctly adds to the
+readability and code quality.
 
 <code>
 subcomponent subcomponent_instance_name (
@@ -54,7 +62,9 @@ subcomponent subcomponent_instance_name (
 );
 </code>
 
-So far all the connections that have been made have reused inputs and output to the sub module and no connectivity wires have been created. What happens if we are to take outputs from one component to another:
+So far all the connections that have been made have reused inputs and
+output to the sub module and no connectivity wires have been created.
+What happens if we are to take outputs from one component to another:
 
 <code>
 clk_gen( 
@@ -69,7 +79,10 @@ subcomponent subcomponent_instance_name (
 );
 </code>
 
-This nominally works as a wire for clk_sub is automatically created, there is a danger to relying on this. it will only ever create a 1 bit wire by default. An example where this is a problem would be for the data:
+This nominally works as a wire for clk_sub is automatically created,
+there is a danger to relying on this. it will only ever create a 1
+bit wire by default. An example where this is a problem would be for
+the data:
 
 Note that the instance name for the second component has been changed
 
@@ -88,7 +101,10 @@ subcomponent subcomponent_instance_name2 (
 );
 </code>
 
-The issue with the above code is that data_temp is only 1 bit wide, there would be a compile warning about port width mismatch. The connectivity wire needs to be created and a width specified. I would recommend that all connectivity wires be explicitly written out.
+The issue with the above code is that data_temp is only 1 bit wide,
+there would be a compile warning about port width mismatch. The
+connectivity wire needs to be created and a width specified. I would
+recommend that all connectivity wires be explicitly written out.
 
 <code>
 wire [9:0] data_temp
@@ -106,9 +122,15 @@ subcomponent subcomponent_instance_name2 (
 );
 </code>
 
-Moving to SystemVerilog there are a few tricks available that save typing a handful of characters. I believe that they hinder the code readability and can make it harder to find bugs.
+Moving to SystemVerilog there are a few tricks available that save
+typing a handful of characters. I believe that they hinder the
+code readability and can make it harder to find bugs.
 
-Use .port with no brackets to connect to a wire/reg of the same name. This can look neat especially with lots of clk and resets but at some levels you may generate different clocks or resets or you actually do not want to connect to the signal of the same name but a modified one and this can lead to wiring bugs that are not obvious to the eye.
+Use .port with no brackets to connect to a wire/reg of the same name.
+This can look neat especially with lots of clk and resets but at some
+levels you may generate different clocks or resets or you actually do
+not want to connect to the signal of the same name but a modified one
+and this can lead to wiring bugs that are not obvious to the eye.
 
 <code>
 module top(
@@ -130,7 +152,13 @@ subcomponent subcomponent_instance_name (
 endmodule
 </code>
 
-Another trick that I think is even worse than the one above is .* which connects unmentioned ports to signals of the same wire. I consider this to be quite dangerous in production code. It is not obvious when new ports have been added and are missing or that they might accidentally get connected if the new port name had a counter part in the instancing level, they get auto connected and no warning would be generated.
+Another trick that I think is even worse than the one above is .*
+which connects unmentioned ports to signals of the same wire. I
+consider this to be quite dangerous in production code. It is not
+obvious when new ports have been added and are missing or that they
+might accidentally get connected if the new port name had a counter
+part in the instancing level, they get auto connected and no warning
+would be generated.
 
 <code>
 subcomponent subcomponent_instance_name (
