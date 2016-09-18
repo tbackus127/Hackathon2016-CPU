@@ -1,9 +1,7 @@
-module program_counter (regOP, );
+module program_counter (regOP, newReg, offset);
 
 input [15:0]regOP;
 output [15:0]newReg;
-
-if (regOP[])
 
 assign newReg[0] = ;
 assign newReg[1] = ;
