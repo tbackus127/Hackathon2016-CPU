@@ -356,3 +356,33 @@ module SetL(
    assign Result[6] = OperandA[6];
    assign Result[7] = OperandA[7];
 endmodule // SetL
+
+//All of the follwing modules were written after 9 am. Use at your own risk.
+module IsLessThan(
+		  OperandA,
+		  OperandB,
+		  Result
+		  );
+
+   input [15:0] OperandA;
+   input [15:0] OperandB;
+   output 	Result;
+
+   assign Result = (OperandA < OperandB);
+      
+endmodule // IsLessThan
+
+module IsGreaterThan(
+		  OperandA,
+		  OperandB,
+		  Result
+		  );
+
+   input [15:0] OperandA;
+   input [15:0] OperandB;
+   output 	Result;
+
+   assign Result = (OperandA > OperandB);
+      
+endmodule // IsGreaterThan
+
