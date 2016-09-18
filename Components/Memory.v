@@ -19,7 +19,6 @@ module Reg16(reset, CLK, D, Q);
   //And the 2nd 16 are output from the register.
   input wire   [15:0] wRegIn;
   output wire   [15:0] wRegOut;
-   
 
   always @ (posedge CLK)
     if(RES)
@@ -28,38 +27,3 @@ module Reg16(reset, CLK, D, Q);
       wRegOut <= wRegIn; //Non-blocking set to the input
 
 endmodule
-
-
-
-//-----------------------------------------------------------------------------
-// D Flip-Flop
-//-----------------------------------------------------------------------------
-//module flipFlopD
-
-  // I/O Declarations
-  //(
-    //inD,
-    //inClk,
-    //inClr,
-    //inSet,
-    //outQ
-  //);
-  
-  // I/O Assignments
-  
-  //input inD, inClk, inClr, inSet;
-  //output outQ;
-    
-  // Internal state  
-  //reg r;  
-  
-  // Synchronous
-  //always @ (posedge inClr or negedge inClk)
-    //if(inClr)
-      //r <= 1'b0;
-    //else
-      //r <= inD;
-  
-//endmodule
-
-
