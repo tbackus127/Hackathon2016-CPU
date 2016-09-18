@@ -2,7 +2,7 @@
 // 16-bit Register
 //-----------------------------------------------------------------------------
 
-module Reg16(reset, CLK, D, Q);
+module Reg16(RES, CLK, D, Q);
    
 
   // I/O Declarations
@@ -15,16 +15,11 @@ module Reg16(reset, CLK, D, Q);
   //of 16 registers, as denoted by [15:0]. 
   reg    [15:0] Q;
 
-  //Creates 32 wires, 2 sets of 16. the first 16 are input to the register,
-  //And the 2nd 16 are output from the register.
-  input wire   [15:0] wRegIn;
-  output wire   [15:0] wRegOut;
-
   always @ (posedge CLK)
     if(RES)
-      wRegOut = 0; 
+      Q <= 0; 
     else
-      wRegOut = wRegIn; 
+      Q <= D; 
 
-endmodule; // Reg16
+endmodule // Reg16
 
