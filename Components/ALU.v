@@ -3,25 +3,6 @@
  * The ALU and all of its nonsense
  * ----------------------------------------------------
  */
-module ALU(
-	   Opcode,
-	   OperandA,
-	   OperandB,
-	   Carry,
-	   Overflow,
-	   Result);
-   
-
-   input  [4:0]  Opcode; //The opcode for what the ALU is actually doing
-   input [15:0]  OperandA;
-   input [15:0]  OperandB;
-
-   output        Carry;
-   output        Overflow;
-   output [15:0] Result;
-   
-
-endmodule // alu
 
 module AndOp(
 	     OperandA,
@@ -131,70 +112,54 @@ module NotOp(
    not(Result[15], OperandA[15]);
 endmodule // NotOp
 
-module carry_select_adder_subtractor(
-				     OperandA, 
-				     OperandB, 
-				     Op, 
-				     Result, 
-				     Carry, 
-				     Overflow);     
-
-   input  [15:0] OperandA; //The 16-bit augend/minuend.
-   input  [15:0] OperandB; //The 16-bit addend/subtrahend.
-   input         Op;       //0 to add, and 1 to subtract.
-   output [15:0] Result;   //The 16-bit result
-   output        Carry;    //The 1 bit carry/borrow status
-   output        Overflow; //The 1 bit overflow
-		 
-   wire 	 CarryBit; // The carry out bit of adder/subtractor, used to generate final carry/borrrow.   
-   wire [15:0] 	 Bx;       //The current bit in transition 
+module carry_select_adder_subtractor(S, C, V, A, B, Op);
+   output [15:0] S;   // The 16-bit sum/difference.
+   output 	 C;   // The 1-bit carry/borrow status.
+   output 	 V;   // The 1-bit overflow status.
+   input [15:0]  A;   // The 16-bit augend/minuend.
+   input [15:0]  B;   // The 16-bit addend/subtrahend.
+   input 	 Op;  // The operation: 0 => Add, 1=>Subtract.
+   
+   wire 	 C15; // The carry out bit of adder/subtractor, used to generate final carry/borrrow.   
+   wire [15:0] 	 Bx;
    
    // Looking at the truth table for not we see that  
    // B xor 0 = B, and
    // B xor 1 = not(B).
    // So, if Op==1 means we are subtracting, then
-   // adding A and B xor Op along with setting the first
+   // adding A and B xor Op alog with setting the first
    // carry bit to Op, will give us a result of
    // A+B when Op==0, and A+not(B)+1 when Op==1.
    // Note that not(B)+1 is the 2's complement of B, so
    // this gives us subtraction.     
-   xor(Bx[0],  OperandB[0],  Op);
-   xor(Bx[1],  OperandB[1],  Op);
-   xor(Bx[2],  OperandB[2],  Op);
-   xor(Bx[3],  OperandB[3],  Op);
-   xor(Bx[4],  OperandB[4],  Op);
-   xor(Bx[5],  OperandB[5],  Op);
-   xor(Bx[6],  OperandB[6],  Op);
-   xor(Bx[7],  OperandB[7],  Op);
-   xor(Bx[8],  OperandB[8],  Op);
-   xor(Bx[9],  OperandB[9],  Op);
-   xor(Bx[10], OperandB[10], Op);
-   xor(Bx[11], OperandB[11], Op);
-   xor(Bx[12], OperandB[12], Op);
-   xor(Bx[13], OperandB[13], Op);
-   xor(Bx[14], OperandB[14], Op);
-   xor(Bx[15], OperandB[15], Op);
-   xor(C, CarryBit, Op);            // Carry = CarryBit for addition, Carry = not(CarryBit) for subtraction.
-
-   //This is the actual thing that adds and subtracts the stuff.
-   carry_select_adder csa(OperandA, OperandB, Op, Result, Carry, Overflow);   
-endmodule // carry_select_adder_subtractor
+   xor(Bx[0], B[0], Op);
+   xor(Bx[1], B[1], Op);
+   xor(Bx[2], B[2], Op);
+   xor(Bx[3], B[3], Op);
+   xor(Bx[4], B[4], Op);
+   xor(Bx[5], B[5], Op);
+   xor(Bx[6], B[6], Op);
+   xor(Bx[7], B[7], Op);
+   xor(Bx[8], B[8], Op);
+   xor(Bx[9], B[9], Op);
+   xor(Bx[10], B[10], Op);
+   xor(Bx[11], B[11], Op);
+   xor(Bx[12], B[12], Op);
+   xor(Bx[13], B[13], Op);
+   xor(Bx[14], B[14], Op);
+   xor(Bx[15], B[15], Op);
+   xor(C, C15, Op);            // Carry = C15 for addition, Carry = not(C15) for subtraction.
+   carry_select_adder csa(S, C15, V, A, Bx, Op);   
+endmodule // carry_select_adder_subtractor 
 
 //The actual adder. 
-module carry_select_adder(
-			  OperandA,
-			  OperandB,
-			  CarryIn,
-			  Result,
-			  Carry,
-			  Overflow);
-   
-   input  [15:0]  OperandA;   // The 16-bit augend.
-   input  [15:0]  OperandB;   // The 16-bit addend.
-   input 	  CarryIn;    // The initial carry in.
-   output [15:0]  Result;     // The 16-bit sum.
-   output 	  Carry;      // The 1-bit carry.
-   output 	  Overflow;   // The 1-bit overflow status.
+module carry_select_adder(S, C, V, A, B, Cin);
+   output [15:0] S;   // The 16-bit sum.
+   output 	 C;   // The 1-bit carry.
+   output 	 V;   // The 1-bit overflow status.
+   input [15:0]  A;   // The 16-bit augend.
+   input [15:0]  B;   // The 16-bit addend.
+   input 	 Cin; // The initial carry in.
 
    
    wire [3:0] 	S1_0;   // Nibble 1 sum output with carry input 0.
@@ -282,23 +247,28 @@ module ripple_carry_adder(S, C, V, A, B, Cin);
    xor(V, C, C2);  // Overflow   
 endmodule // ripple_carry_adder
 
-module full_adder(S, Cout, A, B, Cin);
-   output S;
-   output Cout;
+module full_adder(
+		  Sum, 
+		  CarryOut, 
+		  A, 
+		  B, 
+		  CarryIn);
+   output Sum;
+   output CarryOut;
    input  A;
    input  B;
-   input  Cin;
+   input  CarryIn;
    
    wire   w1;
    wire   w2;
    wire   w3;
    wire   w4;
    
-   xor(w1, A, B);
+   xor(A, B, w1);
    xor(S, Cin, w1);
-   and(w2, A, B);   
-   and(w3, A, Cin);
-   and(w4, B, Cin);   
+   and(A, B, w2);   
+   and(A, Cin, w3);
+   and(B, Cin, w4);   
    or(Cout, w2, w3, w4);
 endmodule // full_adder
 
@@ -314,37 +284,6 @@ module multiplexer_2_1(X, A0, A1, S);
    assign X = (S == 1'b0) ? A0 : A1;
 endmodule // multiplexer_2_1
 
-module multiplexer_8_1(X, A0, A1, A2, A3, A4, A5, A6, A7, S);
-   parameter WIDTH=16;     // How many bits wide are the lines
-
-   output [WIDTH-1:0] X;   // The output line
-
-   input [WIDTH-1:0]  A7;  // Input line with id 3'b111
-   input [WIDTH-1:0]  A6;  // Input line with id 3'b110
-   input [WIDTH-1:0]  A5;  // Input line with id 3'b101
-   input [WIDTH-1:0]  A4;  // Input line with id 3'b100
-   input [WIDTH-1:0]  A3;  // Input line with id 3'b011
-   input [WIDTH-1:0]  A2;  // Input line with id 3'b010
-   input [WIDTH-1:0]  A1;  // Input line with id 3'b001
-   input [WIDTH-1:0]  A0;  // Input line with id 3'b000
-   input [2:0]	      S;   
-
-   assign X = (S[2] == 0 
-	       ? (S[1] == 0 
-		  ? (S[0] == 0 
-		     ? A0       // {S2,S1,S0} = 3'b000
-		     : A1)      // {S2,S1,S0} = 3'b001
-		  : (S[0] == 0 
-		     ? A2       // {S2,S1,S0} = 3'b010
-		     : A3))     // {S2,S1,S0} = 3'b011
-	       : (S[1] == 0 
-		  ? (S[0] == 0 
-		     ? A4       // {S2,S1,S0} = 3'b100
-		     : A5)      // {S2,S1,S0} = 3'b101
-		  : (S[0] == 0 
-		     ? A6       // {S2,S1,S0} = 3'b110
-		     : A7)));   // {S2,S1,S0} = 3'b111
-endmodule // multiplexer_8_1	   
 
 module IsEqual(
 	       OperandA,
@@ -352,18 +291,20 @@ module IsEqual(
 	       Result);
 
    input [15:0] OperandA;
-   input [15:0] OperandA;
+   input [15:0] OperandB;
    output       Result;
-   reg   [15:0] Holder;
+   input   [15:0] Holder;
    
-   XorOp xor(OperandA, OperandB, Holder);
+   XorOp Big_Xor(.OperandA(OperandA), 
+		 .OperandB(OperandB), 
+		 .Result(Holder));
    assign Result = 0;
    or(Result, Result, Holder[0]);
    or(Result, Result, Holder[1]);
    or(Result, Result, Holder[2]);
    or(Result, Result, Holder[3]);
    or(Result, Result, Holder[4]);
-   or(Result, Result, Holder[5];
+   or(Result, Result, Holder[5]);
    or(Result, Result, Holder[6]);
    or(Result, Result, Holder[7]);
    or(Result, Result, Holder[8]);
@@ -377,3 +318,39 @@ module IsEqual(
 
    not(Result,Result);
 endmodule // IsEqual
+
+module SetH(
+	    OperandA,
+	    Result
+	    );
+
+   input  [15:0] OperandA;
+   output [15:0] Result;
+
+   assign Result[8] = OperandA[0];
+   assign Result[9] = OperandA[1];
+   assign Result[10] = OperandA[2];
+   assign Result[11] = OperandA[3];
+   assign Result[12] = OperandA[4];
+   assign Result[13] = OperandA[5];
+   assign Result[14] = OperandA[6];
+   assign Result[15] = OperandA[7];
+endmodule // SetH
+
+module SetL(
+	    OperandA,
+	    Result
+	    );
+
+   input  [15:0] OperandA;
+   output [15:0] Result;
+
+   assign Result[0] = OperandA[0];
+   assign Result[1] = OperandA[1];
+   assign Result[2] = OperandA[2];
+   assign Result[3] = OperandA[3];
+   assign Result[4] = OperandA[4];
+   assign Result[5] = OperandA[5];
+   assign Result[6] = OperandA[6];
+   assign Result[7] = OperandA[7];
+endmodule // SetL
