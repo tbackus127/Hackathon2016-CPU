@@ -1,23 +1,9 @@
-module program_counter (regOP, newReg, offset);
+module program_counter (offset)
 
-input [15:0]regOP;
-output [15:0]newReg;
+input  [15:0]offset;  // offset into the program
+reg    [15:0]regOP;  // the original register location
+output [15:0]newReg; // the new location
 
-assign newReg[0] = ;
-assign newReg[1] = ;
-assign newReg[2] = ;
-assign newReg[3] = ;
-assign newReg[4] = ;
-assign newReg[5] = ;
-assign newReg[6] = ;
-assign newReg[7] = ;
-assign newReg[8] = ;
-assign newReg[9] = ;
-assign newReg[10] = ;
-assign newReg[11] = ;
-assign newReg[12] = ;
-assign newReg[13] = ;
-assign newReg[14] = ;
-assign newReg[15] = ;
+carry_select_adder_subtractor(newReg, 0, 0, regOP, offset, 0);
 
 end module
